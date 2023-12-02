@@ -1,0 +1,106 @@
+/* Global styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+h1 {
+    color: #333;
+}
+
+/* Form styles */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 8px;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 16px;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    input, button {
+        width: 100%;
+    }
+}
+
+/* Landing page specific styles */
+body.landing {
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.animated {
+    animation: fadeInUp 1s ease-out;
+}
+
+/* Quiz specific styles */
+.quiz-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    display: none; /* Quiz is initially hidden until started */
+}
+
+#timer {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.question-container {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+/* Quiz Results specific styles */
+body.quiz-results {
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Quiz Taker specific styles */
+body.quiz-taker {
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Register specific styles */
+body.register {
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+}

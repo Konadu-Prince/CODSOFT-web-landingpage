@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styles for quiz.html */
+        body {
+            background-image: url('background.jpg'); /* Replace 'background.jpg' with your image */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            display: none; /* Quiz is initially hidden until started */
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #timer {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-container {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
+    <title>Quiz</title>
+</head>
+<body>
+    <div class="quiz-container" id="quizContainer">
+        <!-- Quiz content will be dynamically loaded here -->
+    </div>
+
+    <button onclick="startQuiz()">Start Quiz</button>
+
+    <script src="script.js"></script>
+</body>
+</html>

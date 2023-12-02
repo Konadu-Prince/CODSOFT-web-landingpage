@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Quiz Taking</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Title</h1>
+        <div id="quizContainer">
+            <!-- Questions and options dynamically added here -->
+        </div>
+        <button onclick="nextQuestion()">Next Question</button>
+        <button onclick="submitQuiz()">Submit Quiz</button>
+    </div>
+    <script src="script.js"></script>
+
+
+   
+    
+    <div class="container">
+        <h1>Quiz Taking</h1>
+        <!-- Display quiz questions and options here -->
+        <div id="questionContainer"></div>
+        <button onclick="nextQuestion()">Next Question</button>
+        <p id="feedback"></p>
+    </div>
+
+    <script>
+        // Simulated backend logic
+        const quizQuestions = [
+            { question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Rome"], correctAnswer: "Paris" },
+            { question: "What is the largest planet in our solar system?", options: ["Earth", "Jupiter", "Mars", "Venus"], correctAnswer: "Jupiter" },
+            // Add more questions as needed
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function nextQuestion() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+            
+            if (selectedOption) {
+                if (selectedOption.value === quizQuestions[currentQuestionIndex].correctAnswer) {
+                    score++;
+                }
+
+                currentQuestionIndex++;
+
+                if (currentQuestionIndex < quizQuestions.length) {
+                    displayQuestion();
+                } else {
+                    displayScore();
+                }
+            } else {
+                document.getElementById('feedback').textContent = 'Please select an option.';
+            }
+        }
+
+        function displayQuestion() {
+            const questionContainer = document.getElementById('questionContainer');
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+
+            let optionsHTML = '';
+            for (let i = 0; i < currentQuestion.options.length; i++) {
+                optionsHTML += `<label><input type="radio" name="option" value="${currentQuestion.options[i]}"> ${currentQuestion.options[i]}</label><br>`;
+            }
+
+            questionContainer.innerHTML = `<p>${currentQuestion.question}</p>${optionsHTML}`;
+            document.getElementById('feedback').textContent = '';
+        }
+
+        function displayScore() {
+            const questionContainer = document.getElementById('questionContainer');
+            questionContainer.innerHTML = `<p>Your final score is: ${score} out of ${quizQuestions.length}</p>`;
+            document.getElementById('feedback').textContent = '';
+        }
+
+        // Initial display
+        displayQuestion();
+    </script>
+</body>
+</html>
