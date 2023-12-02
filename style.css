@@ -53,7 +53,7 @@ button {
 
 /* Landing page specific styles */
 body.landing {
-    background-image: url('background.jpg');
+    background-image: url('online-e-learning-landing-page.webp');
     background-size: cover;
     background-position: center;
 }
@@ -86,21 +86,21 @@ body.landing {
 
 /* Quiz Results specific styles */
 body.quiz-results {
-    background-image: url('background.jpg');
+    background-image: url('online-e-learning-landing-page.webp');
     background-size: cover;
     background-position: center;
 }
 
 /* Quiz Taker specific styles */
 body.quiz-taker {
-    background-image: url('background.jpg');
+    background-image: url('online-e-learning-landing-page.webp');
     background-size: cover;
     background-position: center;
 }
 
 /* Register specific styles */
 body.register {
-    background-image: url('background.jpg');
+    background-image: url('online-e-learning-landing-page.webp');
     background-size: cover;
     background-position: center;
 }
