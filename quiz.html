@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
     <style>
         /* Additional styles for quiz.html */
         body {
@@ -83,10 +83,20 @@
 </head>
 <body>
     <div class="quiz-container" id="quizContainer">
-        <!-- Quiz content will be dynamically loaded here -->
+        <div id="timerDisplay">00:00</div>
+        <div id="quizContent"></div>
     </div>
 
     <button onclick="startQuiz()">Start Quiz</button>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id && typeof displayQuiz === 'function') {
+          displayQuiz(id);
+        }
+      });
+    </script>
 
     <script src="script.js"></script>
 </body>

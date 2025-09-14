@@ -1,126 +1,55 @@
 // server.js
-
 const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const morgan = require('morgan');
 
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
-// Connect to MongoDB (Make sure you have MongoDB running)
-mongoose.connect('mongodb://localhost:27017/quizdb', { useNewUrlParser: true, useUnifiedTopology: true });
-const db = mongoose.connection;
+app.use(bodyParser.json());
+app.use(cors());
+app.use(helmet());
+app.use(rateLimit({ windowMs: 60 * 1000, max: 120 }));
+app.use(morgan('combined'));
+app.use(express.static('.'));
 
-// Define User Schema
-const userSchema = new mongoose.Schema({
-    username: { type: String, unique: true },
-    password: String,
-});
-
-const User = mongoose.model('User', userSchema);
-
-app.use(express.json());
-
-// Authentication middleware
-function authenticateToken(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.sendStatus(401);
-
-    jwt.verify(token, 'your-secret-key', (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
-}
+// MongoDB connection (non-fatal if unavailable)
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/onlinequiz';
+mongoose
+  .connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.warn('MongoDB not available, continuing without DB:', err.message);
+  });
 
 // Routes
-app.post('/register', async (req, res) => {
-    const { username, password } = req.body;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({ username, password: hashedPassword });
-    newUser.save(err => {
-        if (err) {
-            res.status(500).send('Error registering user');
-        } else {
-            res.status(201).send('User registered successfully');
-        }
-    });
-});
-
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).send('User not found');
-
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(401).send('Invalid password');
-
-    const accessToken = jwt.sign({ username: user.username }, 'your-secret-key');
-    res.json({ accessToken });
-});
-
-// Example protected route
-app.get('/protected', authenticateToken, (req, res) => {
-    res.json({ data: 'This is a protected route' });
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-// server.js
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(bodyParser.json());
-
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/onlinequiz', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB');
-});
-
-// Define your routes here
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
-
-// server.js
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const authRoutes = require('./routes/authRoutes');
 const quizRoutes = require('./routes/quizRoutes');
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(bodyParser.json());
-
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/onlinequiz', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB');
-});
-
-// Use routes
+app.use('/api/auth', authRoutes);
 app.use('/api/quizzes', quizRoutes);
+
+// 404
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Not Found' });
+});
+
+// Error handler
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
