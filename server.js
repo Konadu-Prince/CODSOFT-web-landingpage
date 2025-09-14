@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 
 dotenv.config();
@@ -14,6 +15,7 @@ const port = process.env.PORT || 3002;
 app.use(bodyParser.json());
 app.use(cors());
 app.use(helmet());
+app.use(rateLimit({ windowMs: 60 * 1000, max: 120 }));
 app.use(morgan('combined'));
 app.use(express.static('.'));
 

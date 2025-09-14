@@ -84,10 +84,19 @@
 <body>
     <div class="quiz-container" id="quizContainer">
         <div id="timerDisplay">00:00</div>
-        <!-- Quiz content will be dynamically loaded here -->
+        <div id="quizContent"></div>
     </div>
 
     <button onclick="startQuiz()">Start Quiz</button>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id && typeof displayQuiz === 'function') {
+          displayQuiz(id);
+        }
+      });
+    </script>
 
     <script src="script.js"></script>
 </body>
