@@ -17,7 +17,8 @@ function updateTimer() {
     const displayMinutes = timerMinutes < 10 ? `0${timerMinutes}` : timerMinutes;
     const displaySeconds = timerSeconds < 10 ? `0${timerSeconds}` : timerSeconds;
 
-    document.getElementById('timerDisplay').textContent = `${displayMinutes}:${displaySeconds}`;
+    const el = document.getElementById('timerDisplay');
+    if (el) { el.textContent = `${displayMinutes}:${displaySeconds}`; }
 }
  
 // quizLogic.js
@@ -54,8 +55,10 @@ function submitQuiz() {
     // Optionally, you can reset the timer and quiz for a retake
     timerSeconds = 0;
     timerMinutes = 0;
-    document.getElementById('timerDisplay').textContent = '00:00';
-    document.getElementById('quizContainer').innerHTML = '';
+    const timerEl = document.getElementById('timerDisplay');
+    if (timerEl) timerEl.textContent = '00:00';
+    const containerEl = document.getElementById('quizContainer');
+    if (containerEl) containerEl.innerHTML = '';
 
     // Reset user inputs
     const inputElements = document.querySelectorAll('input');
@@ -112,7 +115,11 @@ function displayScore() {
 }
 
 // Initial display
-displayQuestion();
+window.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('questionContainer')) {
+        displayQuestion();
+    }
+});
 // backendLogic.js
 // Sample data for quizzes (replace with actual data from your backend)
 const quizzes = [
@@ -160,7 +167,7 @@ function displayQuiz(quizId) {
 
         const submitButton = document.createElement("button");
         submitButton.textContent = "Submit Quiz";
-        submitButton.onclick = submitQuiz;
+        submitButton.onclick = submitQuizResults;
         quizContainer.appendChild(submitButton);
     } else {
         alert("Quiz not found!");
@@ -168,7 +175,7 @@ function displayQuiz(quizId) {
 }
 
 // Function to simulate submitting a quiz and show results
-function submitQuiz() {
+function submitQuizResults() {
     // Logic to gather user answers and compare with correct answers
     // Display the user's score and correct answers
 
@@ -182,7 +189,8 @@ const users = [
     // Add more users as needed
 ];
 
-function registerUser() {
+function registerUser(event) {
+    if (event && event.preventDefault) event.preventDefault();
     const registerForm = document.getElementById('registerForm');
     const username = registerForm.querySelector('#username').value;
     const password = registerForm.querySelector('#password').value;
@@ -201,7 +209,8 @@ function registerUser() {
     }
 }
 
-function loginUser() {
+function loginUser(event) {
+    if (event && event.preventDefault) event.preventDefault();
     const loginForm = document.getElementById('loginForm');
     const username = loginForm.querySelector('#username').value;
     const password = loginForm.querySelector('#password').value;
@@ -214,5 +223,65 @@ function loginUser() {
         window.location.href = 'index.html';
     } else {
         alert('Invalid username or password. Please try again.');
+    }
+}
+
+// Quiz Creator helpers
+function addQuestion() {
+    const container = document.getElementById('questionsContainer');
+    if (!container) return;
+
+    const index = container.children.length;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'question-container';
+    wrapper.innerHTML = `
+                <label>Question ${index + 1}:</label>
+                <input type="text" class="qc-question" placeholder="Enter question text" required>
+                <div class="option-container">
+                    <label>Option A:</label>
+                    <input type="text" class="qc-option" placeholder="Option A" required>
+                    <label>Option B:</label>
+                    <input type="text" class="qc-option" placeholder="Option B" required>
+                    <label>Option C:</label>
+                    <input type="text" class="qc-option" placeholder="Option C" required>
+                    <label>Option D:</label>
+                    <input type="text" class="qc-option" placeholder="Option D" required>
+                </div>
+                <label>Correct Answer (copy one option exactly):</label>
+                <input type="text" class="qc-correct" placeholder="Correct answer" required>
+            `;
+    container.appendChild(wrapper);
+}
+
+async function submitCreatedQuiz() {
+    const titleInput = document.getElementById('quizTitle');
+    const questionsContainer = document.getElementById('questionsContainer');
+    if (!titleInput || !questionsContainer) return;
+
+    const title = titleInput.value.trim();
+    const questionBlocks = Array.from(questionsContainer.getElementsByClassName('question-container'));
+    const questions = questionBlocks.map(block => {
+        const question = block.querySelector('.qc-question').value.trim();
+        const options = Array.from(block.querySelectorAll('.qc-option')).map(i => i.value.trim()).filter(Boolean);
+        const correctAnswer = block.querySelector('.qc-correct').value.trim();
+        return { question, options, correctAnswer };
+    });
+
+    if (!title || questions.length === 0) {
+        alert('Please provide a title and at least one question.');
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/quizzes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, questions })
+        });
+        if (!res.ok) throw new Error('Failed to create quiz');
+        alert('Quiz created successfully');
+        window.location.href = 'quizList.html';
+    } catch (e) {
+        alert('Error creating quiz');
     }
 }
