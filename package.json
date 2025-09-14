@@ -4,7 +4,7 @@
   "private": true,
   "main": "server.js",
   "scripts": {
-    "start": "PORT=3002 node server.js"
+    "start": "PORT=8080 node server.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
