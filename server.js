@@ -4,20 +4,23 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 
 app.use(bodyParser.json());
 app.use(express.static('.'));
 
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/onlinequiz', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB');
-});
+// MongoDB connection (non-fatal if unavailable)
+mongoose
+  .connect('mongodb://localhost:27017/onlinequiz', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.warn('MongoDB not available, continuing without DB:', err.message);
+  });
 
 // Routes
 try {
