@@ -213,45 +213,45 @@ function submitQuizResults() {
 }
 // userAuthentication.js
 // Sample user data (replace with actual user data from your backend)
-const users = [
-    { username: 'user1', password: 'password1' },
-    { username: 'user2', password: 'password2' }
-    // Add more users as needed
-];
+let authToken = localStorage.getItem('authToken') || '';
 
-function registerUser(event) {
+async function registerUser(event) {
     if (event && event.preventDefault) event.preventDefault();
     const registerForm = document.getElementById('registerForm');
     const username = registerForm.querySelector('#username').value;
     const password = registerForm.querySelector('#password').value;
 
-    // Check if the username is unique
-    const isUnique = !users.some(user => user.username === username);
-
-    if (isUnique) {
-        // Add the new user to the users array (replace with backend registration logic)
-        users.push({ username, password });
-
-        // Redirect to the login page
+    try {
+        const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) throw new Error('Registration failed');
         window.location.href = 'login.html';
-    } else {
-        alert('Username already exists. Please choose a different username.');
+    } catch (e) {
+        alert('Registration failed.');
     }
 }
 
-function loginUser(event) {
+async function loginUser(event) {
     if (event && event.preventDefault) event.preventDefault();
     const loginForm = document.getElementById('loginForm');
     const username = loginForm.querySelector('#username').value;
     const password = loginForm.querySelector('#password').value;
 
-    // Check if the provided credentials match any user (replace with backend login logic)
-    const isValidUser = users.some(user => user.username === username && user.password === password);
-
-    if (isValidUser) {
-        // Redirect to the home page or another authenticated page
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) throw new Error('Login failed');
+        const data = await res.json();
+        authToken = data.token;
+        localStorage.setItem('authToken', authToken);
         window.location.href = 'index.html';
-    } else {
+    } catch (e) {
         alert('Invalid username or password. Please try again.');
     }
 }
@@ -305,13 +305,14 @@ async function submitCreatedQuiz() {
     try {
         const res = await fetch('/api/quizzes', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({ title, questions })
         });
         if (!res.ok) throw new Error('Failed to create quiz');
         alert('Quiz created successfully');
         window.location.href = 'quizList.html';
     } catch (e) {
-        alert('Error creating quiz');
+        const fb = document.getElementById('creatorFeedback');
+        if (fb) fb.textContent = 'Error creating quiz. Are you logged in?';
     }
 }
