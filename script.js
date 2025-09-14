@@ -135,26 +135,56 @@ const quizzes = [
 ];
 
 // Function to display quizzes on the quizList.html page
-function displayQuizzes() {
+async function displayQuizzes() {
     const quizListContainer = document.getElementById("quizList");
+    if (!quizListContainer) return;
     quizListContainer.innerHTML = "";
 
-    quizzes.forEach(quiz => {
-        const listItem = document.createElement("li");
-        listItem.innerHTML = `<a href="quiz.html?id=${quiz.id}">${quiz.title}</a>`;
-        quizListContainer.appendChild(listItem);
-    });
+    try {
+        const res = await fetch('/api/quizzes');
+        if (!res.ok) throw new Error('Failed to load quizzes');
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = 'No quizzes available yet.';
+            quizListContainer.appendChild(li);
+            return;
+        }
+        data.forEach(quiz => {
+            const listItem = document.createElement("li");
+            const id = quiz._id || quiz.id;
+            listItem.innerHTML = `<a href="quiz.html?id=${id}">${quiz.title}</a>`;
+            quizListContainer.appendChild(listItem);
+        });
+    } catch (e) {
+        const li = document.createElement('li');
+        li.textContent = 'Failed to load quizzes.';
+        quizListContainer.appendChild(li);
+    }
 }
 
 // Function to display quiz questions on the quiz.html page
-function displayQuiz(quizId) {
-    const quiz = quizzes.find(q => q.id == quizId);
+async function displayQuiz(quizId) {
+    const quizContainer = document.getElementById("quizContainer");
+    if (!quizContainer) return;
+    quizContainer.innerHTML = '';
+
+    let quiz = null;
+    try {
+        const res = await fetch(`/api/quizzes/${quizId}`);
+        if (res.ok) {
+            quiz = await res.json();
+        }
+    } catch (e) {}
+
+    if (!quiz) {
+        quiz = (Array.isArray(quizzes) ? quizzes.find(q => (q.id == quizId)) : null) || null;
+    }
 
     if (quiz) {
-        const quizContainer = document.getElementById("quizContainer");
         quizContainer.innerHTML = `<h1>${quiz.title}</h1>`;
 
-        quiz.questions.forEach((q, index) => {
+        (quiz.questions || []).forEach((q, index) => {
             const questionElement = document.createElement("div");
             questionElement.innerHTML = `
                 <p>${index + 1}. ${q.question}</p>
