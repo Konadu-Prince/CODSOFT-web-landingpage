@@ -152,14 +152,17 @@ const quizzes = [
 async function displayQuizzes(page = 1) {
   const quizListContainer = document.getElementById('quizList');
   const searchInput = document.getElementById('searchInput');
+  const categoryInput = document.getElementById('categoryInput');
   const pagination = document.getElementById('pagination');
   if (!quizListContainer) return;
   quizListContainer.innerHTML = '';
   if (pagination) pagination.innerHTML = '';
 
   const q = searchInput ? searchInput.value.trim() : '';
+  const category = categoryInput ? categoryInput.value.trim() : '';
   const params = new URLSearchParams();
   if (q) params.set('q', q);
+  if (category) params.set('category', category);
   params.set('page', String(page));
   params.set('limit', '10');
 
@@ -177,7 +180,15 @@ async function displayQuizzes(page = 1) {
     items.forEach((quiz) => {
       const listItem = document.createElement('li');
       const id = quiz._id || quiz.id;
-      listItem.innerHTML = `<a href="quiz.html?id=${id}">${quiz.title}</a>`;
+      const meta = [];
+      if (quiz.category) meta.push(quiz.category);
+      const subtitle = meta.length ? ` <small>(${meta.join(' - ')})</small>` : '';
+      listItem.innerHTML = `<a href="quiz.html?id=${id}">${quiz.title}</a>${subtitle}`;
+      if (quiz.description) {
+        const p = document.createElement('p');
+        p.textContent = quiz.description;
+        listItem.appendChild(p);
+      }
       quizListContainer.appendChild(listItem);
     });
     const totalPages = data.pages || 1;
@@ -201,6 +212,7 @@ async function displayQuizzes(page = 1) {
 async function displayQuiz(quizId) {
   const quizContainer = document.getElementById('quizContainer');
   const quizContent = document.getElementById('quizContent');
+  const quizMeta = document.getElementById('quizMeta');
   if (!quizContainer || !quizContent) return;
   quizContent.innerHTML = '';
 
@@ -221,6 +233,12 @@ async function displayQuiz(quizId) {
 
   quizContainer.style.display = 'block';
   quizContent.insertAdjacentHTML('beforeend', `<h1>${quiz.title}</h1>`);
+  if (quizMeta) {
+    const parts = [];
+    if (quiz.category) parts.push(quiz.category);
+    if (quiz.description) parts.push(quiz.description);
+    quizMeta.textContent = parts.join(' • ');
+  }
   (quiz.questions || []).forEach((q, index) => {
     const questionElement = document.createElement('div');
     questionElement.className = 'question-container';

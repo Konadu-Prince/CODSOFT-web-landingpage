@@ -82,6 +82,12 @@
           style="padding: 8px; width: 60%"
         />
         <button id="searchBtn">Search</button>
+        <input
+          id="categoryInput"
+          type="text"
+          placeholder="Category"
+          style="padding: 8px; width: 30%; margin-left: 8px"
+        />
       </div>
       <ul id="quizList">
         <!-- Quizzes will be loaded here -->
@@ -99,6 +105,11 @@
           const input = document.getElementById('searchInput');
           if (input)
             input.addEventListener('keyup', (e) => {
+              if (e.key === 'Enter') displayQuizzes();
+            });
+          const cat = document.getElementById('categoryInput');
+          if (cat)
+            cat.addEventListener('keyup', (e) => {
               if (e.key === 'Enter') displayQuizzes();
             });
         }

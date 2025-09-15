@@ -9,6 +9,7 @@ router.get(
   '/',
   [
     query('q').optional().isString().trim(),
+    query('category').optional().isString().trim(),
     query('page').optional().isInt({ min: 1 }).toInt(),
     query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
   ],
@@ -18,14 +19,19 @@ router.get(
       if (!errors.isEmpty())
         return res.status(400).json({ message: 'Invalid query', errors: errors.array() });
 
-      const { q = '', page = 1, limit = 10 } = req.query;
-      const filter = q
-        ? { title: { $regex: String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } }
-        : {};
+      const { q = '', category = '', page = 1, limit = 10 } = req.query;
+      const filter = {};
+      if (q)
+        filter.title = { $regex: String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
+      if (category)
+        filter.category = {
+          $regex: String(category).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+          $options: 'i',
+        };
 
       const total = await Quiz.countDocuments(filter);
       const quizzes = await Quiz.find(filter)
-        .select('_id title createdAt')
+        .select('_id title category description createdAt')
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit);

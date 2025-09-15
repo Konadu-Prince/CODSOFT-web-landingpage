@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>My Results</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>My Results</h1>
+      <ul id="myResults"></ul>
+      <a href="quizList.html">Back to Quizzes</a>
+    </div>
+    <script src="script.js"></script>
+    <script>
+      (async function () {
+        try {
+          const token = localStorage.getItem('authToken');
+          if (!token) {
+            window.location.href = 'login.html';
+            return;
+          }
+          const res = await fetch('/api/me/results', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) throw new Error('Failed to load');
+          const data = await res.json();
+          const ul = document.getElementById('myResults');
+          if (!Array.isArray(data) || data.length === 0) {
+            ul.innerHTML = '<li>No results yet.</li>';
+            return;
+          }
+          data.forEach((r) => {
+            const li = document.createElement('li');
+            const quizTitle = r.quiz && r.quiz.title ? r.quiz.title : 'Quiz';
+            li.textContent = `${quizTitle}: ${r.score}/${r.total} in ${r.timeTaken || 0}s on ${new Date(r.createdAt).toLocaleString()}`;
+            ul.appendChild(li);
+          });
+        } catch (e) {
+          const ul = document.getElementById('myResults');
+          ul.innerHTML = '<li>Failed to load results.</li>';
+        }
+      })();
+    </script>
+  </body>
+</html>

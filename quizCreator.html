@@ -109,7 +109,17 @@
         <p id="creatorFeedback"></p>
       </form>
     </div>
-
     <script src="script.js"></script>
+    <script>
+      // Simple auth guard: redirect to login if no token
+      (function () {
+        try {
+          var token = localStorage.getItem('authToken');
+          if (!token) {
+            window.location.href = 'login.html';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>
