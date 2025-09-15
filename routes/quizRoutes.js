@@ -25,7 +25,8 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, async (req, res) => {
   try {
     const { title, questions } = req.body || {};
-    if (!title || !Array.isArray(questions)) return res.status(400).json({ message: 'Invalid payload' });
+    if (!title || !Array.isArray(questions))
+      return res.status(400).json({ message: 'Invalid payload' });
     const quiz = await Quiz.create({ title, questions, createdBy: req.user.sub });
     res.status(201).json(quiz);
   } catch (e) {
@@ -35,7 +36,11 @@ router.post('/', auth, async (req, res) => {
 
 router.put('/:id', auth, async (req, res) => {
   try {
-    const updated = await Quiz.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true, runValidators: true });
+    const updated = await Quiz.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true },
+    );
     if (!updated) return res.status(404).json({ message: 'Quiz not found' });
     res.json(updated);
   } catch (e) {
@@ -54,4 +59,3 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
-

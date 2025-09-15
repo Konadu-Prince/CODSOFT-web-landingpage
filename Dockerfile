@@ -11,8 +11,9 @@ RUN npm ci || npm install --silent
 COPY . .
 
 # Expose
-EXPOSE 3002
+EXPOSE 8080
 
 ENV NODE_ENV=production
+ENV PORT=8080
 
 CMD ["npm", "start"]
