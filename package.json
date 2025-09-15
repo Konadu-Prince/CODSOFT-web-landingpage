@@ -7,11 +7,15 @@
     "start": "node server.js",
     "dev": "nodemon --signal SIGTERM server.js",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "compose:up": "docker compose up --build -d",
+    "compose:down": "docker compose down -v",
+    "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

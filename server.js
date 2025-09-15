@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 const morgan = require('morgan');
 const path = require('path');
 const config = require('./config');
@@ -45,8 +46,23 @@ app.use(
 // Basic rate limiting
 app.use(rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false }));
 app.use(morgan('combined'));
-// Static assets
-app.use(express.static('.'));
+// Compression
+app.use(
+  compression({
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      return compression.filter(req, res);
+    },
+  }),
+);
+// Static assets with caching
+app.use(
+  express.static('.', {
+    maxAge: '1d',
+    etag: true,
+    lastModified: true,
+  }),
+);
 
 // Health check
 app.get('/healthz', (req, res) => {

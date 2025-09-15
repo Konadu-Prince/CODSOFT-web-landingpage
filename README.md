@@ -33,6 +33,28 @@ npm start
   - GET /api/quizzes/:id/results
 
 ### Request validation
+## Docker Compose
+
+Start app with MongoDB locally:
+
+```
+npm run compose:up
+```
+
+Stop and remove volumes:
+
+```
+npm run compose:down
+```
+
+## Seeding
+
+Seed a demo user and quiz (requires Mongo running and `MONGO_URI` set):
+
+```
+npm run seed
+```
+
 
 - Auth register: { username (3-32), email?, password (>=6) }
 - Auth login: { username, password }
