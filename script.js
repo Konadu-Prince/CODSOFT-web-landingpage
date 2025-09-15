@@ -177,6 +177,14 @@ window.registerUser = registerUser;
 window.loginUser = loginUser;
 window.addQuestion = addQuestion;
 window.submitCreatedQuiz = submitCreatedQuiz;
+window.logout = function logout() {
+  try {
+    localStorage.removeItem('authToken');
+  } catch (e) {
+    console.warn('Failed to clear auth token during logout:', e);
+  }
+  window.location.href = 'index.html';
+};
 
 async function registerUser(event) {
   if (event && event.preventDefault) event.preventDefault();
