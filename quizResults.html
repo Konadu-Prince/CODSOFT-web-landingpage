@@ -56,10 +56,17 @@
 
     <div class="container">
       <h1>Quiz Results</h1>
-      <!-- Display quiz results dynamically here -->
-      <p>Score: 8/10</p>
-      <p>Congratulations! You've completed the quiz.</p>
+      <div id="results"></div>
       <button onclick="location.href='quizList.html'">Back to Quiz List</button>
     </div>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id && typeof displayResults === 'function') {
+          displayResults(id);
+        }
+      });
+    </script>
   </body>
 </html>

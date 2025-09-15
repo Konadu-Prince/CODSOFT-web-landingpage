@@ -148,28 +148,48 @@ const quizzes = [
   // Add more quizzes as needed
 ];
 
-// Function to display quizzes on the quizList.html page
-async function displayQuizzes() {
+// Function to display quizzes on the quizList.html page (with search/pagination)
+async function displayQuizzes(page = 1) {
   const quizListContainer = document.getElementById('quizList');
+  const searchInput = document.getElementById('searchInput');
+  const pagination = document.getElementById('pagination');
   if (!quizListContainer) return;
   quizListContainer.innerHTML = '';
+  if (pagination) pagination.innerHTML = '';
+
+  const q = searchInput ? searchInput.value.trim() : '';
+  const params = new URLSearchParams();
+  if (q) params.set('q', q);
+  params.set('page', String(page));
+  params.set('limit', '10');
 
   try {
-    const res = await fetch('/api/quizzes');
+    const res = await fetch(`/api/quizzes?${params.toString()}`);
     if (!res.ok) throw new Error('Failed to load quizzes');
     const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) {
+    const items = Array.isArray(data) ? data : data.items;
+    if (!Array.isArray(items) || items.length === 0) {
       const li = document.createElement('li');
       li.textContent = 'No quizzes available yet.';
       quizListContainer.appendChild(li);
       return;
     }
-    data.forEach((quiz) => {
+    items.forEach((quiz) => {
       const listItem = document.createElement('li');
       const id = quiz._id || quiz.id;
       listItem.innerHTML = `<a href="quiz.html?id=${id}">${quiz.title}</a>`;
       quizListContainer.appendChild(listItem);
     });
+    const totalPages = data.pages || 1;
+    if (pagination && totalPages > 1) {
+      for (let p = 1; p <= totalPages; p++) {
+        const btn = document.createElement('button');
+        btn.textContent = String(p);
+        if (p === (data.page || page)) btn.disabled = true;
+        btn.addEventListener('click', () => displayQuizzes(p));
+        pagination.appendChild(btn);
+      }
+    }
   } catch (e) {
     const li = document.createElement('li');
     li.textContent = 'Failed to load quizzes.';
@@ -177,11 +197,12 @@ async function displayQuizzes() {
   }
 }
 
-// Function to display quiz questions on the quiz.html page
+// Function to display quiz questions on the quiz.html page (radio options + submission)
 async function displayQuiz(quizId) {
   const quizContainer = document.getElementById('quizContainer');
-  if (!quizContainer) return;
-  quizContainer.innerHTML = '';
+  const quizContent = document.getElementById('quizContent');
+  if (!quizContainer || !quizContent) return;
+  quizContent.innerHTML = '';
 
   let quiz = null;
   try {
@@ -194,38 +215,55 @@ async function displayQuiz(quizId) {
   }
 
   if (!quiz) {
-    quiz = (Array.isArray(quizzes) ? quizzes.find((q) => q.id == quizId) : null) || null;
-  }
-
-  if (quiz) {
-    quizContainer.innerHTML = `<h1>${quiz.title}</h1>`;
-
-    (quiz.questions || []).forEach((q, index) => {
-      const questionElement = document.createElement('div');
-      questionElement.innerHTML = `
-                <p>${index + 1}. ${q.question}</p>
-                <ul>
-                    ${q.options.map((option) => `<li>${option}</li>`).join('')}
-                </ul>
-            `;
-      quizContainer.appendChild(questionElement);
-    });
-
-    const submitButton = document.createElement('button');
-    submitButton.textContent = 'Submit Quiz';
-    submitButton.onclick = submitQuizResults;
-    quizContainer.appendChild(submitButton);
-  } else {
     alert('Quiz not found!');
+    return;
   }
+
+  quizContainer.style.display = 'block';
+  quizContent.insertAdjacentHTML('beforeend', `<h1>${quiz.title}</h1>`);
+  (quiz.questions || []).forEach((q, index) => {
+    const questionElement = document.createElement('div');
+    questionElement.className = 'question-container';
+    const optionsHTML = q.options
+      .map((opt) => `<label><input type="radio" name="q_${index}" value="${opt}"> ${opt}</label>`)
+      .join('');
+    questionElement.innerHTML = `
+            <p>${index + 1}. ${q.question}</p>
+            <div>${optionsHTML}</div>
+        `;
+    quizContent.appendChild(questionElement);
+  });
+
+  const submitButton = document.createElement('button');
+  submitButton.textContent = 'Submit Quiz';
+  submitButton.onclick = async () => {
+    const answers = (quiz.questions || []).map((q, idx) => {
+      const selected = (document.querySelector(`input[name="q_${idx}"]:checked`) || {}).value || '';
+      return { selected };
+    });
+    try {
+      const res = await fetch(`/api/quizzes/${quizId}/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
+        body: JSON.stringify({ answers }),
+      });
+      if (!res.ok) throw new Error('submit failed');
+      const result = await res.json();
+      alert(`Your Score: ${result.score} / ${result.total}`);
+      window.location.href = `quizResults.html?id=${quizId}`;
+    } catch (e) {
+      alert('Failed to submit quiz.');
+    }
+  };
+  quizContent.appendChild(submitButton);
 }
 
 // Function to simulate submitting a quiz and show results
 function submitQuizResults() {
-  // Logic to gather user answers and compare with correct answers
-  // Display the user's score and correct answers
-
-  alert('Quiz submitted! Display results here.');
+  alert('This function has been replaced by server submission.');
 }
 // userAuthentication.js
 // Sample user data (replace with actual user data from your backend)

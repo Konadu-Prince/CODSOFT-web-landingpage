@@ -33,6 +33,7 @@ npm start
   - GET /api/quizzes/:id/results
 
 ### Request validation
+
 - Auth register: { username (3-32), email?, password (>=6) }
 - Auth login: { username, password }
 - Create quiz: { title, questions: [{ question, options[>=2], correctAnswer }] }

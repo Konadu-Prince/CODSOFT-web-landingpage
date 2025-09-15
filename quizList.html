@@ -74,9 +74,19 @@
   <body>
     <div class="container">
       <h1>Available Quizzes</h1>
+      <div style="margin-bottom: 16px">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search by title"
+          style="padding: 8px; width: 60%"
+        />
+        <button id="searchBtn">Search</button>
+      </div>
       <ul id="quizList">
         <!-- Quizzes will be loaded here -->
       </ul>
+      <div id="pagination" style="margin-top: 12px"></div>
       <a href="index.html">Back to Home</a>
     </div>
     <script src="script.js"></script>
@@ -84,6 +94,13 @@
       window.addEventListener('DOMContentLoaded', () => {
         if (typeof displayQuizzes === 'function') {
           displayQuizzes();
+          const btn = document.getElementById('searchBtn');
+          if (btn) btn.addEventListener('click', () => displayQuizzes());
+          const input = document.getElementById('searchInput');
+          if (input)
+            input.addEventListener('keyup', (e) => {
+              if (e.key === 'Enter') displayQuizzes();
+            });
         }
       });
     </script>
