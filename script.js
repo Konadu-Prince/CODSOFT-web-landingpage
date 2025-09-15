@@ -29,124 +29,7 @@ function startQuiz() {
   startTimer();
 }
 
-function submitQuiz() {
-  // Sample scoring logic
-  const answers = {
-    q1: 'Paris',
-    q2: 'Mars',
-    // Add more answers as needed
-  };
-
-  let score = 0;
-
-  for (const questionId in answers) {
-    const userAnswer = document.getElementById(questionId).value.trim();
-    const correctAnswer = answers[questionId];
-
-    if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
-      score++;
-    }
-  }
-
-  // Display the score
-  alert(`Your Score: ${score} / ${Object.keys(answers).length}`);
-
-  // Stop the timer
-  clearInterval(timer);
-
-  // Optionally, you can reset the timer and quiz for a retake
-  timerSeconds = 0;
-  timerMinutes = 0;
-  const timerEl = document.getElementById('timerDisplay');
-  if (timerEl) timerEl.textContent = '00:00';
-  const containerEl = document.getElementById('quizContainer');
-  if (containerEl) containerEl.innerHTML = '';
-
-  // Reset user inputs
-  const inputElements = document.querySelectorAll('input');
-  inputElements.forEach((input) => (input.value = ''));
-}
-// quizTaker.js
-// Simulated backend logic
-const quizQuestions = [
-  {
-    question: 'What is the capital of France?',
-    options: ['Berlin', 'Madrid', 'Paris', 'Rome'],
-    correctAnswer: 'Paris',
-  },
-  {
-    question: 'What is the largest planet in our solar system?',
-    options: ['Earth', 'Jupiter', 'Mars', 'Venus'],
-    correctAnswer: 'Jupiter',
-  },
-  // Add more questions as needed
-];
-
-let currentQuestionIndex = 0;
-let score = 0;
-
-function nextQuestion() {
-  const selectedOption = document.querySelector('input[name="option"]:checked');
-
-  if (selectedOption) {
-    if (selectedOption.value === quizQuestions[currentQuestionIndex].correctAnswer) {
-      score++;
-    }
-
-    currentQuestionIndex++;
-
-    if (currentQuestionIndex < quizQuestions.length) {
-      displayQuestion();
-    } else {
-      displayScore();
-    }
-  } else {
-    document.getElementById('feedback').textContent = 'Please select an option.';
-  }
-}
-
-function displayQuestion() {
-  const questionContainer = document.getElementById('questionContainer');
-  const currentQuestion = quizQuestions[currentQuestionIndex];
-
-  let optionsHTML = '';
-  for (let i = 0; i < currentQuestion.options.length; i++) {
-    optionsHTML += `<label><input type="radio" name="option" value="${currentQuestion.options[i]}"> ${currentQuestion.options[i]}</label><br>`;
-  }
-
-  questionContainer.innerHTML = `<p>${currentQuestion.question}</p>${optionsHTML}`;
-  document.getElementById('feedback').textContent = '';
-}
-
-function displayScore() {
-  const questionContainer = document.getElementById('questionContainer');
-  questionContainer.innerHTML = `<p>Your final score is: ${score} out of ${quizQuestions.length}</p>`;
-  document.getElementById('feedback').textContent = '';
-}
-
-// Initial display
-window.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('questionContainer')) {
-    displayQuestion();
-  }
-});
-// backendLogic.js
-// Sample data for quizzes (replace with actual data from your backend)
-const quizzes = [
-  {
-    id: 1,
-    title: 'Sample Quiz 1',
-    questions: [
-      { question: 'What is 2 + 2?', options: ['3', '4', '5'], correctAnswer: '4' },
-      {
-        question: 'Which is the capital of France?',
-        options: ['Berlin', 'Madrid', 'Paris'],
-        correctAnswer: 'Paris',
-      },
-    ],
-  },
-  // Add more quizzes as needed
-];
+// Legacy demo code removed
 
 // Function to display quizzes on the quizList.html page (with search/pagination)
 async function displayQuizzes(page = 1) {
@@ -286,6 +169,14 @@ function submitQuizResults() {
 // userAuthentication.js
 // Sample user data (replace with actual user data from your backend)
 let authToken = localStorage.getItem('authToken') || '';
+// Expose functions used in inline HTML handlers
+window.startQuiz = startQuiz;
+window.displayQuizzes = displayQuizzes;
+window.displayQuiz = displayQuiz;
+window.registerUser = registerUser;
+window.loginUser = loginUser;
+window.addQuestion = addQuestion;
+window.submitCreatedQuiz = submitCreatedQuiz;
 
 async function registerUser(event) {
   if (event && event.preventDefault) event.preventDefault();

@@ -26,6 +26,7 @@ router.post(
       const user = await User.create({ username, email, passwordHash });
       res.status(201).json({ id: user._id, username: user.username });
     } catch (e) {
+      console.error('Register error:', e);
       res.status(500).json({ message: 'registration failed' });
     }
   },
@@ -51,6 +52,7 @@ router.post(
       );
       res.json({ token });
     } catch (e) {
+      console.error('Login error:', e);
       res.status(500).json({ message: 'login failed' });
     }
   },

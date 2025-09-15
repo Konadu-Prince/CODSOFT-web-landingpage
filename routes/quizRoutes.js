@@ -37,6 +37,7 @@ router.get(
         .limit(limit);
       res.json({ items: quizzes, page, limit, total, pages: Math.ceil(total / limit) });
     } catch (e) {
+      console.error('List quizzes error:', e);
       res.status(500).json({ message: 'Failed to fetch quizzes' });
     }
   },
@@ -51,6 +52,7 @@ router.get('/:id', [param('id').isMongoId()], async (req, res) => {
     if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
     res.json(quiz);
   } catch (e) {
+    console.error('Get quiz error:', e);
     res.status(400).json({ message: 'Invalid quiz id' });
   }
 });
@@ -82,6 +84,7 @@ router.post(
       });
       res.status(201).json(quiz);
     } catch (e) {
+      console.error('Create quiz error:', e);
       res.status(400).json({ message: 'Failed to create quiz' });
     }
   },
@@ -101,6 +104,7 @@ router.put('/:id', auth, [param('id').isMongoId()], async (req, res) => {
     await quiz.save();
     res.json(quiz);
   } catch (e) {
+    console.error('Update quiz error:', e);
     res.status(400).json({ message: 'Failed to update quiz' });
   }
 });
@@ -118,6 +122,7 @@ router.delete('/:id', auth, [param('id').isMongoId()], async (req, res) => {
     await quiz.deleteOne();
     res.json({ message: 'Quiz deleted' });
   } catch (e) {
+    console.error('Delete quiz error:', e);
     res.status(400).json({ message: 'Failed to delete quiz' });
   }
 });
@@ -163,6 +168,7 @@ router.post(
       });
       res.status(201).json(result);
     } catch (e) {
+      console.error('Submit quiz error:', e);
       res.status(400).json({ message: 'Failed to submit quiz' });
     }
   },
@@ -179,6 +185,7 @@ router.get('/:id/results', [param('id').isMongoId()], async (req, res) => {
       .limit(50);
     res.json(results);
   } catch (e) {
+    console.error('Fetch results error:', e);
     res.status(400).json({ message: 'Failed to fetch results' });
   }
 });
@@ -195,6 +202,7 @@ router.get('/:id/leaderboard', [param('id').isMongoId()], async (req, res) => {
       .limit(20);
     res.json(results);
   } catch (e) {
+    console.error('Fetch leaderboard error:', e);
     res.status(400).json({ message: 'Failed to fetch leaderboard' });
   }
 });
