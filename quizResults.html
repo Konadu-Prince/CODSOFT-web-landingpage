@@ -57,6 +57,7 @@
     <div class="container">
       <h1>Quiz Results</h1>
       <div id="results"></div>
+      <div id="leaderboard" style="margin-top: 16px"></div>
       <button onclick="location.href='quizList.html'">Back to Quiz List</button>
     </div>
     <script>
@@ -66,6 +67,24 @@
         if (id && typeof displayResults === 'function') {
           displayResults(id);
         }
+        if (id)
+          fetch(`./api/quizzes/${id}/leaderboard`)
+            .then((r) => r.json())
+            .then((rows) => {
+              const lb = document.getElementById('leaderboard');
+              if (!Array.isArray(rows) || rows.length === 0) return;
+              const h = document.createElement('h3');
+              h.textContent = 'Leaderboard';
+              lb.appendChild(h);
+              const ul = document.createElement('ul');
+              rows.forEach((r) => {
+                const li = document.createElement('li');
+                li.textContent = `${r.username || 'Anonymous'} - ${r.score}/${r.total} in ${r.timeTaken || 0}s`;
+                ul.appendChild(li);
+              });
+              lb.appendChild(ul);
+            })
+            .catch(() => {});
       });
     </script>
   </body>

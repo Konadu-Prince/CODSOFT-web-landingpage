@@ -12,6 +12,8 @@ const questionSchema = new mongoose.Schema(
 const quizSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
+    description: { type: String, trim: true, default: '' },
+    category: { type: String, trim: true, default: '' },
     questions: { type: [questionSchema], default: [] },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },

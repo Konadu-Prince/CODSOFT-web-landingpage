@@ -31,8 +31,13 @@ npm start
   - DELETE /api/quizzes/:id (Bearer token, creator only)
   - POST /api/quizzes/:id/submit
   - GET /api/quizzes/:id/results
+  - GET /api/quizzes/:id/leaderboard
+- Me:
+  - GET /api/me (Bearer token)
+  - GET /api/me/results (Bearer token)
 
 ### Request validation
+
 ## Docker Compose
 
 Start app with MongoDB locally:
@@ -55,8 +60,8 @@ Seed a demo user and quiz (requires Mongo running and `MONGO_URI` set):
 npm run seed
 ```
 
-
 - Auth register: { username (3-32), email?, password (>=6) }
 - Auth login: { username, password }
-- Create quiz: { title, questions: [{ question, options[>=2], correctAnswer }] }
+- Create quiz: { title, category?, description?, questions: [{ question, options[>=2], correctAnswer }] }
 - Submit answers: { answers: [{ selected }] } – order should match quiz questions
+  - Optional: timeTaken (seconds)

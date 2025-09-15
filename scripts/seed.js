@@ -25,8 +25,16 @@ async function run() {
         title: quizTitle,
         createdBy: user._id,
         questions: [
-          { question: 'Capital of France?', options: ['Paris', 'London', 'Rome'], correctAnswer: 'Paris' },
-          { question: 'Largest planet?', options: ['Mars', 'Jupiter', 'Venus'], correctAnswer: 'Jupiter' },
+          {
+            question: 'Capital of France?',
+            options: ['Paris', 'London', 'Rome'],
+            correctAnswer: 'Paris',
+          },
+          {
+            question: 'Largest planet?',
+            options: ['Mars', 'Jupiter', 'Venus'],
+            correctAnswer: 'Jupiter',
+          },
         ],
       });
       console.log('Created quiz:', quiz.title);
@@ -42,4 +50,3 @@ async function run() {
 }
 
 run();
-

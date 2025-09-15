@@ -86,8 +86,10 @@ mongoose
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const meRoutes = require('./routes/meRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/quizzes', quizRoutes);
+app.use('/api/me', meRoutes);
 
 // 404
 app.use((req, res, next) => {

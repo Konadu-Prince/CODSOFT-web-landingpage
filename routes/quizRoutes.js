@@ -54,6 +54,8 @@ router.post(
   auth,
   [
     body('title').isString().trim().isLength({ min: 1 }),
+    body('description').optional().isString().trim(),
+    body('category').optional().isString().trim(),
     body('questions').isArray({ min: 1 }),
     body('questions.*.question').isString().trim().notEmpty(),
     body('questions.*.options').isArray({ min: 2 }),
@@ -64,8 +66,14 @@ router.post(
       const errors = validationResult(req);
       if (!errors.isEmpty())
         return res.status(400).json({ message: 'Invalid payload', errors: errors.array() });
-      const { title, questions } = req.body || {};
-      const quiz = await Quiz.create({ title, questions, createdBy: req.user.sub });
+      const { title, description = '', category = '', questions } = req.body || {};
+      const quiz = await Quiz.create({
+        title,
+        description,
+        category,
+        questions,
+        createdBy: req.user.sub,
+      });
       res.status(201).json(quiz);
     } catch (e) {
       res.status(400).json({ message: 'Failed to create quiz' });
@@ -112,7 +120,11 @@ module.exports = router;
 // Submission endpoints
 router.post(
   '/:id/submit',
-  [param('id').isMongoId(), body('answers').isArray({ min: 1 })],
+  [
+    param('id').isMongoId(),
+    body('answers').isArray({ min: 1 }),
+    body('timeTaken').optional().isInt({ min: 0 }).toInt(),
+  ],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -137,8 +149,10 @@ router.post(
       const result = await QuizResult.create({
         quiz: quiz._id,
         user: req.user ? req.user.sub : undefined,
+        username: req.user ? req.user.username : undefined,
         score,
         total: quiz.questions.length,
+        timeTaken: req.body.timeTaken || 0,
         answers: graded,
       });
       res.status(201).json(result);
@@ -160,5 +174,21 @@ router.get('/:id/results', [param('id').isMongoId()], async (req, res) => {
     res.json(results);
   } catch (e) {
     res.status(400).json({ message: 'Failed to fetch results' });
+  }
+});
+
+// Leaderboard - Top results for a quiz
+router.get('/:id/leaderboard', [param('id').isMongoId()], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ message: 'Invalid params', errors: errors.array() });
+    const results = await QuizResult.find({ quiz: req.params.id })
+      .select('username score total timeTaken createdAt')
+      .sort({ score: -1, timeTaken: 1, createdAt: 1 })
+      .limit(20);
+    res.json(results);
+  } catch (e) {
+    res.status(400).json({ message: 'Failed to fetch leaderboard' });
   }
 });

@@ -248,7 +248,7 @@ async function displayQuiz(quizId) {
           'Content-Type': 'application/json',
           ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
         },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers, timeTaken: timerMinutes * 60 + timerSeconds }),
       });
       if (!res.ok) throw new Error('submit failed');
       const result = await res.json();
@@ -339,10 +339,14 @@ function addQuestion() {
 
 async function submitCreatedQuiz() {
   const titleInput = document.getElementById('quizTitle');
+  const categoryInput = document.getElementById('quizCategory');
+  const descriptionInput = document.getElementById('quizDescription');
   const questionsContainer = document.getElementById('questionsContainer');
   if (!titleInput || !questionsContainer) return;
 
   const title = titleInput.value.trim();
+  const category = categoryInput ? categoryInput.value.trim() : '';
+  const description = descriptionInput ? descriptionInput.value.trim() : '';
   const questionBlocks = Array.from(
     questionsContainer.getElementsByClassName('question-container'),
   );
@@ -364,7 +368,7 @@ async function submitCreatedQuiz() {
     const res = await fetch('/api/quizzes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
-      body: JSON.stringify({ title, questions }),
+      body: JSON.stringify({ title, category, description, questions }),
     });
     if (!res.ok) throw new Error('Failed to create quiz');
     alert('Quiz created successfully');
