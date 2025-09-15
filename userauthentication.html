@@ -1,45 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>User Authentication</title>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>User Authentication</h1>
+      <h1>User Authentication</h1>
 
-        <!-- Registration Form -->
-        <form id="registrationForm">
-            <h2>Register</h2>
-            <label for="regUsername">Username:</label>
-            <input type="text" id="regUsername" name="regUsername" required>
+      <!-- Registration Form -->
+      <form id="registrationForm">
+        <h2>Register</h2>
+        <label for="regUsername">Username:</label>
+        <input type="text" id="regUsername" name="regUsername" required />
 
-            <label for="regEmail">Email:</label>
-            <input type="email" id="regEmail" name="regEmail" required>
+        <label for="regEmail">Email:</label>
+        <input type="email" id="regEmail" name="regEmail" required />
 
-            <label for="regPassword">Password:</label>
-            <input type="password" id="regPassword" name="regPassword" required>
+        <label for="regPassword">Password:</label>
+        <input type="password" id="regPassword" name="regPassword" required />
 
-            <button type="button" onclick="registerUser(event)">Register</button>
-        </form>
+        <button type="button" onclick="registerUser(event)">Register</button>
+      </form>
 
-        <hr>
+      <hr />
 
-        <!-- Login Form -->
-        <form id="loginForm">
-            <h2>Login</h2>
-            <label for="loginUsername">Username:</label>
-            <input type="text" id="loginUsername" name="loginUsername" required>
+      <!-- Login Form -->
+      <form id="loginForm">
+        <h2>Login</h2>
+        <label for="loginUsername">Username:</label>
+        <input type="text" id="loginUsername" name="loginUsername" required />
 
-            <label for="loginPassword">Password:</label>
-            <input type="password" id="loginPassword" name="loginPassword" required>
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" name="loginPassword" required />
 
-            <button type="button" onclick="loginUser(event)">Login</button>
-        </form>
+        <button type="button" onclick="loginUser(event)">Login</button>
+      </form>
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

@@ -2,25 +2,75 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 const morgan = require('morgan');
+const path = require('path');
+const config = require('./config');
 
-dotenv.config();
 const app = express();
-const port = process.env.PORT || 8080;
+const port = config.port;
 
+// Trust reverse proxy (needed for correct IPs and https detection in some envs)
+app.set('trust proxy', 1);
+
+// Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Keep bodyParser for compatibility with older clients (can be removed later)
 app.use(bodyParser.json());
-app.use(cors());
-app.use(helmet());
-app.use(rateLimit({ windowMs: 60 * 1000, max: 120 }));
+
+// Security headers
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+
+// CORS configuration
+const allowedOrigins = String(config.corsOrigin)
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+  }),
+);
+
+// Basic rate limiting
+app.use(rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false }));
 app.use(morgan('combined'));
-app.use(express.static('.'));
+// Compression
+app.use(
+  compression({
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      return compression.filter(req, res);
+    },
+  }),
+);
+// Static assets with caching
+app.use(
+  express.static('.', {
+    maxAge: '1d',
+    etag: true,
+    lastModified: true,
+  }),
+);
+
+// Health check
+app.get('/healthz', (req, res) => {
+  res.json({ status: 'ok', env: config.environment });
+});
 
 // MongoDB connection (non-fatal if unavailable)
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/onlinequiz';
+const mongoUri = config.mongoUri;
 mongoose
   .connect(mongoUri, {
     useNewUrlParser: true,
@@ -36,8 +86,10 @@ mongoose
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const meRoutes = require('./routes/meRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/quizzes', quizRoutes);
+app.use('/api/me', meRoutes);
 
 // 404
 app.use((req, res, next) => {
@@ -54,6 +106,3 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-
-
-
