@@ -162,9 +162,31 @@ async function displayQuiz(quizId) {
   quizContent.appendChild(submitButton);
 }
 
-// Function to simulate submitting a quiz and show results
-function submitQuizResults() {
-  alert('This function has been replaced by server submission.');
+// Display quiz results for a given quiz id on quizResults.html
+async function displayResults(quizId) {
+  const container = document.getElementById('results');
+  if (!container) return;
+  container.innerHTML = '';
+  try {
+    const res = await fetch(`/api/quizzes/${quizId}/results`);
+    if (!res.ok) throw new Error('Failed to load results');
+    const rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      container.textContent = 'No results yet.';
+      return;
+    }
+    const ul = document.createElement('ul');
+    rows.forEach((r) => {
+      const li = document.createElement('li');
+      const username = r.username || 'Anonymous';
+      const created = r.createdAt ? new Date(r.createdAt).toLocaleString() : '';
+      li.textContent = `${username}: ${r.score}/${r.total} in ${r.timeTaken || 0}s on ${created}`;
+      ul.appendChild(li);
+    });
+    container.appendChild(ul);
+  } catch (e) {
+    container.textContent = 'Failed to load results.';
+  }
 }
 // userAuthentication.js
 // Sample user data (replace with actual user data from your backend)
@@ -173,6 +195,7 @@ let authToken = localStorage.getItem('authToken') || '';
 window.startQuiz = startQuiz;
 window.displayQuizzes = displayQuizzes;
 window.displayQuiz = displayQuiz;
+window.displayResults = displayResults;
 window.registerUser = registerUser;
 window.loginUser = loginUser;
 window.addQuestion = addQuestion;
@@ -190,13 +213,15 @@ async function registerUser(event) {
   if (event && event.preventDefault) event.preventDefault();
   const registerForm = document.getElementById('registerForm');
   const username = registerForm.querySelector('#username').value;
+  const emailInput = registerForm.querySelector('#email');
+  const email = emailInput ? emailInput.value : '';
   const password = registerForm.querySelector('#password').value;
 
   try {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, email, password }),
     });
     if (!res.ok) throw new Error('Registration failed');
     window.location.href = 'login.html';
