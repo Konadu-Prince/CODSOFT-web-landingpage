@@ -12,6 +12,37 @@ body {
   padding: 20px;
 }
 
+/* Card container */
+.card {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Top navigation */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  text-decoration: underline;
+}
+
 /* Header styles */
 h1 {
   color: #333;
@@ -40,6 +71,17 @@ button {
   cursor: pointer;
 }
 
+button:hover {
+  background-color: #45a049;
+}
+
+input {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
 /* Responsive styles */
 @media only screen and (max-width: 600px) {
   .container {
@@ -53,7 +95,7 @@ button {
 }
 
 /* Landing page specific styles */
-body.landing {
+body.bg-home {
   background-image: url('online-e-learning-landing-page.webp');
   background-size: cover;
   background-position: center;
@@ -85,23 +127,46 @@ body.landing {
   margin-bottom: 20px;
 }
 
-/* Quiz Results specific styles */
-body.quiz-results {
+/* Background variants */
+body.bg-list {
+  background-image: url('OIP.jpeg');
+  background-size: cover;
+  background-position: center;
+}
+
+body.bg-quiz {
+  background-image: url('quiz-night-bg.gif');
+  background-size: cover;
+  background-position: center;
+}
+
+body.bg-results {
+  background-image: url('unnamed.png');
+  background-size: cover;
+  background-position: center;
+}
+
+body.bg-auth,
+body.bg-creator {
   background-image: url('online-e-learning-landing-page.webp');
   background-size: cover;
   background-position: center;
 }
 
-/* Quiz Taker specific styles */
-body.quiz-taker {
-  background-image: url('online-e-learning-landing-page.webp');
-  background-size: cover;
-  background-position: center;
+/* Page spacing to account for fixed nav */
+.page-with-nav {
+  padding-top: 56px;
 }
 
-/* Register specific styles */
-body.register {
-  background-image: url('online-e-learning-landing-page.webp');
-  background-size: cover;
-  background-position: center;
+/* Lists and pagination */
+ul.unstyled {
+  list-style: none;
+  padding: 0;
+}
+
+.pagination {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }

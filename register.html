@@ -6,8 +6,17 @@
     <link rel="stylesheet" href="style.css" />
     <title>User Registration</title>
   </head>
-  <body>
-    <div class="container">
+  <body class="bg-auth page-with-nav">
+    <div class="top-nav">
+      <a href="index.html">Home</a>
+      <a href="quizList.html">Quizzes</a>
+      <a href="quizCreator.html" id="navCreate">Create</a>
+      <a href="myResults.html" id="navMyResults">My Results</a>
+      <a href="login.html" id="navLogin">Login</a>
+      <a href="register.html" id="navRegister">Register</a>
+      <a href="#" id="navLogout" onclick="logout()" style="display: none">Logout</a>
+    </div>
+    <div class="container card" style="margin-top: 100px;">
       <h1>User Registration</h1>
       <form id="registerForm" onsubmit="registerUser(event)">
         <label for="username">Username:</label>
@@ -23,5 +32,20 @@
       </form>
     </div>
     <script src="script.js"></script>
+    <script>
+      (function () {
+        try {
+          var token = localStorage.getItem('authToken');
+          var isAuthed = !!token;
+          document.getElementById('navLogin').style.display = isAuthed ? 'none' : '';
+          document.getElementById('navRegister').style.display = isAuthed ? 'none' : '';
+          document.getElementById('navLogout').style.display = isAuthed ? '' : 'none';
+          var navCreate = document.getElementById('navCreate');
+          var navMyResults = document.getElementById('navMyResults');
+          if (navCreate) navCreate.style.display = isAuthed ? '' : 'none';
+          if (navMyResults) navMyResults.style.display = isAuthed ? '' : 'none';
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>

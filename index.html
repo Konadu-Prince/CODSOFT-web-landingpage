@@ -4,67 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <style>
-      body {
-        background-image: url('online-e-learning-landing-page.webp');
-        background-size: cover;
-        background-position: center;
-        margin: 0;
-        padding: 0;
-        font-family: 'Arial', sans-serif;
-        color: #9fcdec;
-      }
-
-      .container {
-        max-width: 600px;
-        margin: 150px auto;
-        padding: 20px;
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 8px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        text-align: center;
-      }
-
-      h1 {
-        color: #333;
-      }
-
-      p {
-        font-size: 18px;
-        margin-bottom: 20px;
-      }
-
-      button {
-        background-color: #4caf50;
-        color: #fff;
-        padding: 15px 30px;
-        font-size: 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      button:hover {
-        background-color: #45a049;
-      }
-    </style>
+    
     <title>Online Quiz Maker</title>
   </head>
-  <body>
-    <div
-      style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding: 10px;
-        background: rgba(255, 255, 255, 0.85);
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-      "
-    >
+  <body class="bg-home page-with-nav">
+    <div class="top-nav">
+      <a href="index.html">Home</a>
       <a href="quizList.html">Quizzes</a>
       <a href="quizCreator.html" id="navCreate">Create</a>
       <a href="myResults.html" id="navMyResults">My Results</a>
@@ -72,7 +17,7 @@
       <a href="register.html" id="navRegister">Register</a>
       <a href="#" id="navLogout" onclick="logout()" style="display: none">Logout</a>
     </div>
-    <div class="container">
+    <div class="container card" style="margin-top: 150px; text-align: center;">
       <h1>Welcome to the Online Quiz Maker</h1>
       <p>Explore your knowledge with our quizzes or create your own!</p>
       <button onclick="location.href='quizList.html'">Take a Quiz</button>
