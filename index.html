@@ -89,6 +89,10 @@
           document.getElementById('navLogin').style.display = isAuthed ? 'none' : '';
           document.getElementById('navRegister').style.display = isAuthed ? 'none' : '';
           document.getElementById('navLogout').style.display = isAuthed ? '' : 'none';
+          var navCreate = document.getElementById('navCreate');
+          var navMyResults = document.getElementById('navMyResults');
+          if (navCreate) navCreate.style.display = isAuthed ? '' : 'none';
+          if (navMyResults) navMyResults.style.display = isAuthed ? '' : 'none';
         } catch (e) {}
       })();
     </script>
