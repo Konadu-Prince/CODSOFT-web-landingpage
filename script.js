@@ -62,6 +62,7 @@ async function displayQuizzes(page = 1) {
     }
     items.forEach((quiz) => {
       const listItem = document.createElement('li');
+      listItem.className = 'quiz-item';
       const id = quiz._id || quiz.id;
       const meta = [];
       if (quiz.category) meta.push(quiz.category);
