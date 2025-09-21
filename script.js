@@ -3,6 +3,60 @@ let timer;
 let timerSeconds = 0;
 let timerMinutes = 0;
 
+// Theme, Toast, and Loading helpers
+function applySavedTheme() {
+  try {
+    const saved = localStorage.getItem('theme') || 'dark';
+    if (saved === 'light') document.documentElement.classList.add('light');
+    else document.documentElement.classList.remove('light');
+  } catch (e) {}
+}
+
+function toggleTheme() {
+  try {
+    const isLight = document.documentElement.classList.toggle('light');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  } catch (e) {}
+}
+
+function ensureToastContainer() {
+  let c = document.querySelector('.toast-container');
+  if (!c) {
+    c = document.createElement('div');
+    c.className = 'toast-container';
+    document.body.appendChild(c);
+  }
+  return c;
+}
+
+function showToast(message, type = 'success', timeoutMs = 3000) {
+  const container = ensureToastContainer();
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = message;
+  container.appendChild(t);
+  setTimeout(() => {
+    if (t.parentNode) t.parentNode.removeChild(t);
+  }, timeoutMs);
+}
+
+function withLoading(el, fn) {
+  return async function (...args) {
+    const original = el.innerHTML;
+    el.disabled = true;
+    el.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
+    try {
+      return await fn.apply(this, args);
+    } finally {
+      el.disabled = false;
+      el.innerHTML = original;
+    }
+  };
+}
+
+// Apply theme at startup
+applySavedTheme();
+
 function startTimer() {
   timer = setInterval(updateTimer, 1000);
 }
@@ -62,6 +116,7 @@ async function displayQuizzes(page = 1) {
     }
     items.forEach((quiz) => {
       const listItem = document.createElement('li');
+      listItem.className = 'quiz-item';
       const id = quiz._id || quiz.id;
       const meta = [];
       if (quiz.category) meta.push(quiz.category);
@@ -109,10 +164,7 @@ async function displayQuiz(quizId) {
     console.error('Failed to fetch quiz:', e);
   }
 
-  if (!quiz) {
-    alert('Quiz not found!');
-    return;
-  }
+  if (!quiz) { showToast('Quiz not found', 'error'); return; }
 
   quizContainer.style.display = 'block';
   quizContent.insertAdjacentHTML('beforeend', `<h1>${quiz.title}</h1>`);
@@ -153,18 +205,40 @@ async function displayQuiz(quizId) {
       });
       if (!res.ok) throw new Error('submit failed');
       const result = await res.json();
-      alert(`Your Score: ${result.score} / ${result.total}`);
+      showToast(`Your Score: ${result.score} / ${result.total}`, 'success', 4000);
       window.location.href = `quizResults.html?id=${quizId}`;
     } catch (e) {
-      alert('Failed to submit quiz.');
+      showToast('Failed to submit quiz', 'error');
     }
   };
   quizContent.appendChild(submitButton);
 }
 
-// Function to simulate submitting a quiz and show results
-function submitQuizResults() {
-  alert('This function has been replaced by server submission.');
+// Display quiz results for a given quiz id on quizResults.html
+async function displayResults(quizId) {
+  const container = document.getElementById('results');
+  if (!container) return;
+  container.innerHTML = '';
+  try {
+    const res = await fetch(`/api/quizzes/${quizId}/results`);
+    if (!res.ok) throw new Error('Failed to load results');
+    const rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      container.textContent = 'No results yet.';
+      return;
+    }
+    const ul = document.createElement('ul');
+    rows.forEach((r) => {
+      const li = document.createElement('li');
+      const username = r.username || 'Anonymous';
+      const created = r.createdAt ? new Date(r.createdAt).toLocaleString() : '';
+      li.textContent = `${username}: ${r.score}/${r.total} in ${r.timeTaken || 0}s on ${created}`;
+      ul.appendChild(li);
+    });
+    container.appendChild(ul);
+  } catch (e) {
+    container.textContent = 'Failed to load results.';
+  }
 }
 // userAuthentication.js
 // Sample user data (replace with actual user data from your backend)
@@ -173,6 +247,7 @@ let authToken = localStorage.getItem('authToken') || '';
 window.startQuiz = startQuiz;
 window.displayQuizzes = displayQuizzes;
 window.displayQuiz = displayQuiz;
+window.displayResults = displayResults;
 window.registerUser = registerUser;
 window.loginUser = loginUser;
 window.addQuestion = addQuestion;
@@ -190,18 +265,21 @@ async function registerUser(event) {
   if (event && event.preventDefault) event.preventDefault();
   const registerForm = document.getElementById('registerForm');
   const username = registerForm.querySelector('#username').value;
+  const emailInput = registerForm.querySelector('#email');
+  const email = emailInput ? emailInput.value : '';
   const password = registerForm.querySelector('#password').value;
 
   try {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, email, password }),
     });
     if (!res.ok) throw new Error('Registration failed');
+    showToast('Registration successful. Please log in.', 'success', 3500);
     window.location.href = 'login.html';
   } catch (e) {
-    alert('Registration failed.');
+    showToast('Registration failed', 'error');
   }
 }
 
@@ -221,9 +299,10 @@ async function loginUser(event) {
     const data = await res.json();
     authToken = data.token;
     localStorage.setItem('authToken', authToken);
+    showToast('Logged in successfully', 'success');
     window.location.href = 'index.html';
   } catch (e) {
-    alert('Invalid username or password. Please try again.');
+    showToast('Invalid username or password', 'error');
   }
 }
 
@@ -288,10 +367,11 @@ async function submitCreatedQuiz() {
       body: JSON.stringify({ title, category, description, questions }),
     });
     if (!res.ok) throw new Error('Failed to create quiz');
-    alert('Quiz created successfully');
+    showToast('Quiz created successfully', 'success');
     window.location.href = 'quizList.html';
   } catch (e) {
     const fb = document.getElementById('creatorFeedback');
     if (fb) fb.textContent = 'Error creating quiz. Are you logged in?';
+    showToast('Failed to create quiz', 'error');
   }
 }
