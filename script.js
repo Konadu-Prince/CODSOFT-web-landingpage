@@ -3,6 +3,60 @@ let timer;
 let timerSeconds = 0;
 let timerMinutes = 0;
 
+// Theme, Toast, and Loading helpers
+function applySavedTheme() {
+  try {
+    const saved = localStorage.getItem('theme') || 'dark';
+    if (saved === 'light') document.documentElement.classList.add('light');
+    else document.documentElement.classList.remove('light');
+  } catch (e) {}
+}
+
+function toggleTheme() {
+  try {
+    const isLight = document.documentElement.classList.toggle('light');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  } catch (e) {}
+}
+
+function ensureToastContainer() {
+  let c = document.querySelector('.toast-container');
+  if (!c) {
+    c = document.createElement('div');
+    c.className = 'toast-container';
+    document.body.appendChild(c);
+  }
+  return c;
+}
+
+function showToast(message, type = 'success', timeoutMs = 3000) {
+  const container = ensureToastContainer();
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = message;
+  container.appendChild(t);
+  setTimeout(() => {
+    if (t.parentNode) t.parentNode.removeChild(t);
+  }, timeoutMs);
+}
+
+function withLoading(el, fn) {
+  return async function (...args) {
+    const original = el.innerHTML;
+    el.disabled = true;
+    el.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
+    try {
+      return await fn.apply(this, args);
+    } finally {
+      el.disabled = false;
+      el.innerHTML = original;
+    }
+  };
+}
+
+// Apply theme at startup
+applySavedTheme();
+
 function startTimer() {
   timer = setInterval(updateTimer, 1000);
 }
@@ -110,10 +164,7 @@ async function displayQuiz(quizId) {
     console.error('Failed to fetch quiz:', e);
   }
 
-  if (!quiz) {
-    alert('Quiz not found!');
-    return;
-  }
+  if (!quiz) { showToast('Quiz not found', 'error'); return; }
 
   quizContainer.style.display = 'block';
   quizContent.insertAdjacentHTML('beforeend', `<h1>${quiz.title}</h1>`);
@@ -154,10 +205,10 @@ async function displayQuiz(quizId) {
       });
       if (!res.ok) throw new Error('submit failed');
       const result = await res.json();
-      alert(`Your Score: ${result.score} / ${result.total}`);
+      showToast(`Your Score: ${result.score} / ${result.total}`, 'success', 4000);
       window.location.href = `quizResults.html?id=${quizId}`;
     } catch (e) {
-      alert('Failed to submit quiz.');
+      showToast('Failed to submit quiz', 'error');
     }
   };
   quizContent.appendChild(submitButton);
@@ -225,9 +276,10 @@ async function registerUser(event) {
       body: JSON.stringify({ username, email, password }),
     });
     if (!res.ok) throw new Error('Registration failed');
+    showToast('Registration successful. Please log in.', 'success', 3500);
     window.location.href = 'login.html';
   } catch (e) {
-    alert('Registration failed.');
+    showToast('Registration failed', 'error');
   }
 }
 
@@ -247,9 +299,10 @@ async function loginUser(event) {
     const data = await res.json();
     authToken = data.token;
     localStorage.setItem('authToken', authToken);
+    showToast('Logged in successfully', 'success');
     window.location.href = 'index.html';
   } catch (e) {
-    alert('Invalid username or password. Please try again.');
+    showToast('Invalid username or password', 'error');
   }
 }
 
@@ -314,10 +367,11 @@ async function submitCreatedQuiz() {
       body: JSON.stringify({ title, category, description, questions }),
     });
     if (!res.ok) throw new Error('Failed to create quiz');
-    alert('Quiz created successfully');
+    showToast('Quiz created successfully', 'success');
     window.location.href = 'quizList.html';
   } catch (e) {
     const fb = document.getElementById('creatorFeedback');
     if (fb) fb.textContent = 'Error creating quiz. Are you logged in?';
+    showToast('Failed to create quiz', 'error');
   }
 }
